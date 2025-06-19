@@ -10,6 +10,6 @@ public class Main {
 
   @GetMapping("/")
   public String main() {
-    return "main";
+    return "m ain";
   }
 }
