@@ -10,6 +10,6 @@ public class Main {
 
   @GetMapping("/")
   public String main() {
-    return "배포 테스트 중 입니다.";
+    return "배포 테스트 중 입니다.2";
   }
 }
