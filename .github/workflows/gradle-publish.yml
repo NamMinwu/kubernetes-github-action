@@ -51,12 +51,29 @@ jobs:
     needs: ci
 
     steps:
-    - name: Setup Kubeconfig
-      run: |
-        mkdir -p ~/.kube
-        echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl apply -f k8s/deployment.yml
-        kubectl apply -f k8s/service.yml
+      - name: Find deployment.yml and service.yml files
+        id: find_files
+        run: |
+          DEPLOYMENT_PATH=$(find . -type f -name "deployment.yml" | head -n 1)
+          SERVICE_PATH=$(find . -type f -name "service.yml" | head -n 1)
+          echo "deployment.yml: $DEPLOYMENT_PATH"
+          echo "service.yml: $SERVICE_PATH"
+          if [ -z "$DEPLOYMENT_PATH" ] || [ -z "$SERVICE_PATH" ]; then
+            echo "One or both files not found!"
+            exit 1
+          fi
+          echo "::set-output name=deployment::$DEPLOYMENT_PATH"
+          echo "::set-output name=service::$SERVICE_PATH"
+
+      - name: Setup Kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f ${{ steps.find_files.outputs.deployment }}
+          kubectl apply -f ${{ steps.find_files.outputs.service }}
