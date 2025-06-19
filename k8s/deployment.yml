@@ -15,6 +15,6 @@ spec:
       containers:
         - name: ci-cd
           imagePullPolicy: Always
-          image: minwu1234/ci-cd:latest
+          image: minwu1234/ci-cd:IMAGE_TAG
           ports:
             - containerPort: 8080
